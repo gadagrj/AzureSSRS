@@ -1,0 +1,21 @@
+﻿@model AzureSQLRestApi.Models.AzureCreateServerViewModel
+
+
+@if (Model.returnStatusCode == 200 || Model.returnStatusCode == 201)
+{
+    <div class="CreatedResult">
+        <h2>Successfully created Servr</h2>
+        <br />
+        <img src="@Url.Content("~/images/computer-database.png")" alt="db" width="100" height="100" /> <h3>ServerName : @Model.NewServerName</h3>
+        <h4>AdminLoginID: @Model.AdminName</h4>
+        <h4>DataCenter: @Model.DataCenterLocation</h4>
+    </div>
+
+}
+else
+{
+    <h4>Error Occured</h4>
+    <p>Invalid subscription id or see the below error message for exact reason</p>
+    <div>@Model.ErrorMsg</div>
+}
+

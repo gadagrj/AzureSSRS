@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h3>SQL Rest Service API Demo</h3>
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+@using (Html.BeginForm())
+{
+ 
+    <span>Enter your Azure SubScriptionID</span> <input type="text" id="txtSubScription" required />
+    <br />
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1">List Server</a></li>
+            <li><a href="#tabs-2">Create Server</a></li>
+        </ul>
+        <div id="tabs-1">
+            <input type="button" value="Get List" id="btngetList" />
+            <span id="lblServerLIst"></span>
+        </div>
+        <div id="tabs-2">
+            <p>Create.</p>
+
+            <span>Admin Login UserID : </span>
+            <input type="text" required id="adminLoginName" /><br />
+            <span>Admin Login Password: </span>
+            <input type="text" required id="adminLoginPassword" /><br />
+            <span>DataCenter: </span>
+            <select id="regionSelect">
+                <option value="North Central US">North Central US</option>
+                <option value="West US">West US</option>
+                <option value="East Asia">East Asia</option>
+                <option value="North Europe">North Europe</option>
+            </select>
+            <input type="button" value="Crate Server" id="createServer" />
+
+            <span id="newServerDetail"></span>
+        </div>
+
+    </div>
+}
+@Scripts.Render("~/bundles/jquery")
+
+<script>
+    $(function () {
+        $('#tabs').tabs();
+        $('#btngetList').on('click', GetAzureLists);
+        $('#createServer').on('click', createServer);
+    });
+
+    function GetAzureLists() {
+        var txtSubscriptionValue = $.trim($('#txtSubScription').val());
+        if (txtSubscriptionValue == '') {
+            alert("enter Subscription id");
+        } else {
+            $('#lblServerLIst').html('');
+            $.ajax({
+                url: '@Url.Action("GetAzureServerList", "Home")',
+                data: { subscriptionid: txtSubscriptionValue }
+                
+            }).done(function (data) {
+                $('#lblServerLIst').html(data);
+            });
+
+        }
+        return false;
+    }
+
+    function createServer() {
+
+        var errorMsg = '';
+        var isvalid = true;
+        var adminLoginName = $.trim($('#adminLoginName').val());
+        var adminPassword = $.trim($('#adminLoginPassword').val());
+        var datacenter = $('#regionSelect').val();
+        var txtSubscriptionValue = $.trim($('#txtSubScription').val());
+        if (txtSubscriptionValue == "") {
+            errorMsg += "Please enter valid Subscription id \n";
+            isvalid = false;
+        }
+        if (adminLoginName == '') {
+            errorMsg += "Please enter admin login name \n";
+            isvalid = false;
+        }
+        if (adminPassword == '') {
+            errorMsg += "Please enter admin login password \n";
+            isvalid = false;
+        }
+
+
+        //if (/^(?=.*\d)(?=.*[a-z])(?=.*\W)(?=.*[A-Z]){8}$/.test(adminPassword) == false) {
+        //    errorMsg += "Please enter admin login password atleast 8 charecter(it should consist of Uppercase, lowercase, non alphanumeric, number )\n";
+        //    isvalid = false;
+        //}
+        if (!isvalid) {
+            alert(errorMsg);
+
+        } else {
+            $('#newServerDetail').html('');
+            var objparams = {
+                subscriptionid: txtSubscriptionValue,
+                AdminLogin: adminLoginName,
+                AdminLoginPassword: adminPassword,
+                DataCenterLocation: datacenter
+            };
+            $('#createServer').attr('disabled', 'disabled');
+            $.ajax({
+                url: '@Url.Action("createServer", "Home")',
+                data: objparams,
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    $('#newServerDetail').html(data);
+                    $('#createServer').removeAttr('disabled');
+                }
+            });
+            }
+            return false;
+        }
+</script>
+
+
+<style>
+    .ListWrapper {
+        border: 1px solid gray;
+        padding: 2px;
+        width: 100%;
+    }
+
+    .itemWrapper {
+        width: 100%;
+        height: 105px;
+        clear: both;
+    }
+
+    .thumbnail {
+        float: left;
+        width: 8%;
+    }
+
+    .serverDetal {
+        float: left;
+        width: 90%;
+    }
+</style>

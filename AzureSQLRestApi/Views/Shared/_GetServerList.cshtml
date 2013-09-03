@@ -1,0 +1,50 @@
+﻿@using AzureSQLRestApi.Models
+@model AzureSQLRestApi.Models.AzureListViewModel
+
+@if (Model.resultMetadata.returnStatusCode == 200)
+{
+    var count = 1;
+    <h2>Server List </h2>
+    <table class="table table-bordered" width="100%">
+        <tbody>
+            <tr>
+                <th width="3%">Sl.No
+                </th>
+                <th>Server Details
+                </th>
+            </tr>
+            @foreach (var item in Model.serverList)
+            {
+            
+                <tr>
+                    <td>
+                        @count
+                    </td>
+
+                    <td>
+                        <div style="width: 5%; float: left;">
+                            <img src="@Url.Content("~/images/computer-database.png")" alt="db" width="100" height="100" />
+                        </div>
+                        <div style="width: 90%; float: left;">
+                            <span>Server Name : </span><strong>@item.ServerName</strong><br />
+                            <span>Administrator Name : </span><strong>@item.AdminLogin</strong><br />
+                            <span>Datacenter Location : </span><strong>@item.DataCenterLocation</strong>
+                        </div>
+                    </td>
+                </tr>
+            
+                count++;
+            }
+        </tbody>
+    </table>
+    
+}
+else if (Model.resultMetadata.returnStatusCode == 403 || Model.resultMetadata.returnStatusCode == 500)
+{
+    <h4>Error Occured</h4>
+    <p>Invalid subscription id or see the below error message for exact reason</p>
+    <div>@Model.resultMetadata.ErrorMsg</div>
+}
+
+
+
